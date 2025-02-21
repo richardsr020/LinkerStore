@@ -5,7 +5,7 @@ class DatabaseConnection {
     public function __construct() {
         try {
             // Connexion à SQLite avec chiffrement
-            $this->pdo = new PDO("sqlite:linkerstore.db");
+            $this->pdo = new PDO("sqlite:../controller/linkerstore.db");
             
             // Définition du mot de passe pour le chiffrement de la base de données
             $this->pdo->exec("PRAGMA key = '123';");

@@ -1,6 +1,5 @@
 <?php
 
-
 class User extends DatabaseConnection {
     
     public function __construct() {
@@ -10,14 +9,16 @@ class User extends DatabaseConnection {
     /**
      * 🔹 Ajouter un nouvel utilisateur
      */
-    public function createUser($email, $phone, $password) {
+    public function createUser($email, $phone, $password, $role = 'USER', $isLocked = 0) {
         try {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-            $stmt = $this->pdo->prepare("INSERT INTO user (email, phone, password) VALUES (:email, :phone, :password)");
+            $stmt = $this->pdo->prepare("INSERT INTO user (email, phone, password, role, isLocked) VALUES (:email, :phone, :password, :role, :isLocked)");
             $stmt->execute([
                 ':email' => $email,
                 ':phone' => $phone,
-                ':password' => $hashedPassword
+                ':password' => $hashedPassword,
+                ':role' => $role,
+                ':isLocked' => $isLocked
             ]);
             return $this->pdo->lastInsertId();
         } catch (PDOException $e) {
@@ -53,25 +54,40 @@ class User extends DatabaseConnection {
     /**
      * 🔹 Mettre à jour les informations d'un utilisateur
      */
-    public function updateUser($id, $email, $phone, $password = null) {
+    public function updateUser($id, $email, $phone, $password = null, $role = null, $isLocked = null) {
         try {
+            // Préparation de la requête
+            $query = "UPDATE user SET email = :email, phone = :phone";
+            $params = [
+                ':email' => $email,
+                ':phone' => $phone,
+                ':id' => $id
+            ];
+
+            // Ajout du mot de passe si présent
             if ($password) {
                 $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-                $stmt = $this->pdo->prepare("UPDATE user SET email = :email, phone = :phone, password = :password WHERE id = :id");
-                $stmt->execute([
-                    ':email' => $email,
-                    ':phone' => $phone,
-                    ':password' => $hashedPassword,
-                    ':id' => $id
-                ]);
-            } else {
-                $stmt = $this->pdo->prepare("UPDATE user SET email = :email, phone = :phone WHERE id = :id");
-                $stmt->execute([
-                    ':email' => $email,
-                    ':phone' => $phone,
-                    ':id' => $id
-                ]);
+                $query .= ", password = :password";
+                $params[':password'] = $hashedPassword;
             }
+
+            // Ajout du rôle si présent
+            if ($role) {
+                $query .= ", role = :role";
+                $params[':role'] = $role;
+            }
+
+            // Ajout de isLocked si présent
+            if ($isLocked !== null) {
+                $query .= ", isLocked = :isLocked";
+                $params[':isLocked'] = $isLocked;
+            }
+
+            // Exécution de la requête
+            $query .= " WHERE id = :id";
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute($params);
+
             return $stmt->rowCount();
         } catch (PDOException $e) {
             die("Erreur lors de la mise à jour de l'utilisateur : " . $e->getMessage());
@@ -134,8 +150,52 @@ class User extends DatabaseConnection {
             die("Erreur lors de l'authentification : " . $e->getMessage());
         }
     }
+
+    /**
+     * 🔹 Vérifier si un utilisateur est verrouillé
+     */
+    public function isUserLocked($id) {
+        try {
+            $stmt = $this->pdo->prepare("SELECT isLocked FROM user WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+            $user = $stmt->fetch();
+            return $user['isLocked'] == 1;
+        } catch (PDOException $e) {
+            die("Erreur lors de la vérification du verrouillage : " . $e->getMessage());
+        }
+    }
+
+       /**
+     * 🔹 Verrouiller ou déverrouiller un utilisateur
+     */
+    public function lock($id, $isLocked) {
+        try {
+            $stmt = $this->pdo->prepare("UPDATE user SET is_locked = :is_locked WHERE id = :id");
+            $stmt->execute([
+                ':is_locked' => $isLocked ? 1 : 0,
+                ':id' => $id
+            ]);
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
+            die("Erreur lors de la mise à jour du statut de verrouillage : " . $e->getMessage());
+        }
+    }
+
+    /**
+     * 🔹 Mettre à jour le rôle d'un utilisateur
+     */
+    public function setRole($id, $role) {
+        try {
+            $stmt = $this->pdo->prepare("UPDATE user SET role = :role WHERE id = :id");
+            $stmt->execute([
+                ':role' => $role,
+                ':id' => $id
+            ]);
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
+            die("Erreur lors de la mise à jour du rôle : " . $e->getMessage());
+        }
+    }
 }
-
-
 
 ?>

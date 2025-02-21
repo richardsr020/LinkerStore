@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add a Client</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #121212;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+        form {
+            padding: 20px;
+            border-radius: 10px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+        }
+        input, select, button {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+            display: block;
+        }
+        input, select {
+            background: #333;
+            color: #fff;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #message {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .back-link {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            font-size: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .back-link:hover {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Flèche de retour -->
+    <a href="../index.php" class="back-link">&#8592; Back</a>
+
+    <form id="clientForm" enctype="multipart/form-data">
+        <h2>Add a Client</h2>
+        
+        <select id="name" name="name" required>
+            <option value="Artisan ND">Artisan ND</option>
+        </select>
+
+        <input type="email" id="email" name="email" placeholder="Email" required>
+        <input type="tel" id="phone" name="phone" placeholder="Phone Number" required>
+        <input type="file" id="publicKeyFile" name="publicKeyFile" required>
+        <button type="submit">Add</button>
+        <p id="message"></p>
+    </form>
+
+    <script>
+        $(document).ready(function () {
+            $("#clientForm").submit(function (event) {
+                event.preventDefault();
+
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: "../src/controller/addClientController.php",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    dataType: "json",
+                    success: function (response) {
+                        $("#message").text(response.message).css("color", response.success ? "green" : "red");
+                        if (response.success) {
+                            $("#clientForm")[0].reset();
+                        }
+                    },
+                    error: function () {
+                        $("#message").text("Error while sending data.").css("color", "red");
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

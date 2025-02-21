@@ -1,5 +1,5 @@
 <?php
-require_once "DatabaseConnection.php";
+require_once "../entity/DatabaseConnection.php";
 
 class Migration extends DatabaseConnection {
 
@@ -9,29 +9,30 @@ class Migration extends DatabaseConnection {
 
     public function run() {
         try {
-            // Création de la table User
+            // Création de la table User sans contrainte UNIQUE
             $this->pdo->exec("
                 CREATE TABLE IF NOT EXISTS user (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    email TEXT UNIQUE NOT NULL,
-                    phone TEXT UNIQUE NOT NULL,
+                    email TEXT NOT NULL,
+                    phone TEXT NOT NULL,
                     password TEXT NOT NULL,
+                    role TEXT NOT NULL,
                     isLocked BOOLEAN DEFAULT 0 -- 🔹 Ajout de la colonne isLocked
                 );
             ");
 
-            // Création de la table Client
+            // Mise à jour de la table Client sans contrainte UNIQUE
             $this->pdo->exec("
                 CREATE TABLE IF NOT EXISTS client (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT UNIQUE NOT NULL,
-                    email TEXT UNIQUE NOT NULL,
-                    phone TEXT UNIQUE NOT NULL,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    phone TEXT NOT NULL,
                     public_key TEXT NOT NULL
                 );
             ");
 
-            // Création de la table Subscription
+            // Création de la table Subscription sans contrainte UNIQUE
             $this->pdo->exec("
                 CREATE TABLE IF NOT EXISTS subscription (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,6 +42,16 @@ class Migration extends DatabaseConnection {
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
                     FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
+                );
+            ");
+
+            // Création de la table Software sans contrainte UNIQUE
+            $this->pdo->exec("
+                CREATE TABLE IF NOT EXISTS software (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    version TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             ");
 
