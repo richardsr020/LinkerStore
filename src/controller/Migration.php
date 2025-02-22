@@ -47,10 +47,13 @@ class Migration extends DatabaseConnection {
 
             // Création de la table Software sans contrainte UNIQUE
             $this->pdo->exec("
-                CREATE TABLE IF NOT EXISTS software (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    version TEXT NOT NULL,
+                CREATE TABLE software (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    version VARCHAR(255) NOT NULL,
+                    target_platform VARCHAR(50) NOT NULL,
+                    icon VARCHAR(255) NOT NULL,
+                    compressed_file VARCHAR(255) NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             ");

@@ -110,6 +110,10 @@
                     if (result.success) {
                         showMessage("Registration successful!", "success");
                         form.reset();
+                        // Redirection automatique après succès de l'enregistrement
+                        setTimeout(() => {
+                            window.location.href = "logIn.html";
+                        }, 2000); // Attendre 2 secondes avant de rediriger
                     } else {
                         showMessage(result.errors.join("<br>"), "danger");
                     }

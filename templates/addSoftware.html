@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Software</title>
+    <title>Ajouter un Logiciel</title>
+    <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
@@ -15,6 +16,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            position: relative;
         }
         form {
             padding: 20px;
@@ -50,17 +52,52 @@
             margin-top: 10px;
             font-size: 14px;
         }
+        .back-link {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            font-size: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .back-link:hover {
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
 
-    <form id="softwareForm" enctype="multipart/form-data">
-        <h2>Add a Software</h2>
+    <!-- Flèche de retour -->
+    <a href="../index.php" class="back-link">&#8592; Retour</a>
 
-        <input type="text" id="name" name="name" placeholder="Software Name" required>
+    <form id="softwareForm" enctype="multipart/form-data">
+        <h2>Ajouter un Logiciel</h2>
+
+        <!-- Champ Nom du logiciel -->
+        <input type="text" id="name" name="name" placeholder="Nom du logiciel" required>
+
+        <!-- Champ Version -->
         <input type="text" id="version" name="version" placeholder="Version" required>
-        <input type="file" id="softwareFile" name="softwareFile" required accept=".zip,.rar">
-        <button type="submit">Add Software</button>
+
+        <!-- Plateforme Cible -->
+        <select id="targetPlatform" name="targetPlatform" required>
+            <option value="">Plateforme Cible</option>
+            <option value="Linux">Linux</option>
+            <option value="Windows">Windows</option>
+            <option value="Mac">Mac</option>
+        </select>
+
+        <!-- Icône du logiciel -->
+        <label for="file">Icone</label>
+        <input type="file" id="softwareIcon" name="softwareIcon" accept="image/*" required>
+
+        <!-- Fichier compressé -->
+        <label for="file">Choose a zipfile</label>
+        <input type="file" id="compressedFile" name="compressedFile" accept=".zip, .rar" required>
+
+        <button type="submit">Ajouter</button>
         <p id="message"></p>
     </form>
 
@@ -72,7 +109,7 @@
                 let formData = new FormData(this);
 
                 $.ajax({
-                    url: "../src/controller/addSoftwareController.php",
+                    url: "../src/controller/addSoftwareController.php", // Ajustez le chemin selon votre structure
                     type: "POST",
                     data: formData,
                     contentType: false,
@@ -85,9 +122,10 @@
                         }
                     },
                     error: function () {
-                        $("#message").text("Error while sending data.").css("color", "red");
+                        $("#message").text("Erreur lors de l'envoi des données.").css("color", "red");
                     }
                 });
+
             });
         });
     </script>

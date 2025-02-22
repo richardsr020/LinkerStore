@@ -1,17 +1,21 @@
-<?php
-
 class Software extends DatabaseConnection {
 
     public function __construct() {
         parent::__construct();
     }
 
-    // 🔹 Ajouter un logiciel
-    public function create($name, $version) {
-        $stmt = $this->pdo->prepare("INSERT INTO software (name, version) VALUES (:name, :version)");
+    // 🔹 Ajouter un logiciel avec icône et fichier compressé
+    public function create($name, $version, $targetPlatform, $iconFileName, $compressedFileName) {
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO software (name, version, target_platform, icon, compressed_file) 
+             VALUES (:name, :version, :targetPlatform, :icon, :compressedFile)"
+        );
         return $stmt->execute([
             ':name' => $name,
-            ':version' => $version
+            ':version' => $version,
+            ':targetPlatform' => $targetPlatform,
+            ':icon' => $iconFileName,
+            ':compressedFile' => $compressedFileName
         ]);
     }
 
@@ -29,12 +33,17 @@ class Software extends DatabaseConnection {
     }
 
     // 🔹 Mettre à jour un logiciel
-    public function update($id, $name, $version) {
-        $stmt = $this->pdo->prepare("UPDATE software SET name = :name, version = :version WHERE id = :id");
+    public function update($id, $name, $version, $targetPlatform, $iconFileName, $compressedFileName) {
+        $stmt = $this->pdo->prepare(
+            "UPDATE software SET name = :name, version = :version, target_platform = :targetPlatform, icon = :icon, compressed_file = :compressedFile WHERE id = :id"
+        );
         return $stmt->execute([
             ':id' => $id,
             ':name' => $name,
-            ':version' => $version
+            ':version' => $version,
+            ':targetPlatform' => $targetPlatform,
+            ':icon' => $iconFileName,
+            ':compressedFile' => $compressedFileName
         ]);
     }
 
@@ -44,4 +53,3 @@ class Software extends DatabaseConnection {
         return $stmt->execute([':id' => $id]);
     }
 }
-?>
